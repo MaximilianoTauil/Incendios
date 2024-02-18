@@ -39,13 +39,23 @@ def cantidad_porcentaje(dataframe, columna):
     print(f'\nEl porcentaje que representa cada valor:\n{porcentaje_columna.to_string(header=False)}')
 
 def cantidad_porcentaje_sum(dataframe, columna_valores,columna_referencia):
-
-    suma = dataframe[columna_valores].sum()
-
-    porcentaje_columna = round((dataframe[columna_valores]/ suma) * 100, 2)
     
-    dataframe['Porcentaje'] = porcentaje_columna
+    df_copy = dataframe.copy()
+
+    suma = df_copy[columna_valores].sum()
+
+    porcentaje_columna = round((df_copy[columna_valores]/ suma) * 100, 2)
+
+    df_copy['Porcentaje'] = porcentaje_columna
     
     print(f'El valor total de la columna {columna_valores} es:\n\n{suma}')
     
-    print(f'\nEl porcentaje que representa cada valor es:\n\n{dataframe[[columna_referencia,'Porcentaje']]}')
+    print(f'\nEl porcentaje que representa cada valor es:\n\n{df_copy[[columna_referencia,'Porcentaje']]}')
+
+def tasas_año(dataframe,columna_valores,escala_multiplicacion):
+    total = dataframe[columna_valores].sum()
+    dataframe['Tasa'] = round((dataframe[columna_valores] / total)*escala_multiplicacion,2)
+    dataframe['Tasa_anterior'] = dataframe['Tasa'].shift(periods=1,fill_value=0)
+    dataframe['Diferencia'] = round(dataframe['Tasa'] - dataframe['Tasa_anterior'],2)
+    dataframe.loc[dataframe.index[0], 'Diferencia'] = 0
+    dataframe
